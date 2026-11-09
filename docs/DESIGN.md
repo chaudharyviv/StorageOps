@@ -8,7 +8,7 @@ StorageOps is a NetApp-only, end-to-end AI system that forecasts ONTAP storage p
 
 **In scope**
 
-- ONTAP objects: aggregates, FlexVol volumes, snapshots, SnapMirror, QoS policies, storage efficiency. Trident PVCs are an extra, simulated by default and lab-verified if the NetApp lab allows.
+- ONTAP objects: aggregates, FlexVol volumes, snapshots, SnapMirror, QoS policies, storage efficiency. Trident PVCs are an extra and are simulated; the project does not claim validation against a real Trident install.
 - Synthetic telemetry served by a mock ONTAP REST API, plus Harvest-style Prometheus metrics.
 - A forecasting and anomaly model, a QLoRA fine-tuned incident summarizer, an eval harness with a CI promotion gate, an MCP server, a LangGraph triage agent, an approval and audit gate, and a drift-triggered retrain workflow.
 
@@ -41,7 +41,7 @@ Twenty components, each with one job and a contract with its neighbours, so Clau
 | # | Component | Job | Tech | Phase |
 | --- | --- | --- | --- | --- |
 | 1 | Telemetry simulator | Generates ONTAP-style metrics and injects labelled failures | Python, NumPy | 1 |
-| 2 | Mock ONTAP REST API | Serves volumes, aggregates, SnapMirror and QoS in the real ONTAP REST shape, backed by the simulator | FastAPI | 1 |
+| 2 | Mock ONTAP REST API | Serves volumes, aggregates, SnapMirror and QoS in the shape of NetApp's public ONTAP REST documentation (a documented subset), backed by the simulator | FastAPI | 1 |
 | 3 | Scenario library | Failure definitions kept apart from the generator, with a held-out set | YAML + Python | 1 |
 | 4 | Ingest and validate | Moves metrics into the store and checks schema, ranges and gaps | File or Redis queue, Great Expectations | 1 |
 | 5 | Features and store | Growth rates, time-to-full, snapshot ratio, latency percentiles, same code for training and serving | DuckDB, Polars | 1 |
@@ -67,7 +67,7 @@ Five records carry everything between components. They live in one shared `contr
 
 | Record | Key fields | Written by | Read by |
 | --- | --- | --- | --- |
-| MetricRecord | ts, cluster, object\_type (aggregate, volume, snapmirror, qos), object\_id, metric, value, unit | Simulator, ingest | Features, drift monitor |
+| MetricRecord | ts, cluster, object\_type (aggregate, volume, snapmirror, qos, trident\_backend), object\_id, metric, value, unit | Simulator, ingest | Features, drift monitor |
 | Alert | alert\_id, ts, object\_id, source (rule or model), severity, evidence window | Forecaster, anomaly model | Agent, dashboard |
 | Incident | incident\_id, alert\_ids, summary, runbook\_steps, model\_version, retrieved\_docs | Summarizer, agent | Dashboard, eval harness |
 | ProposedAction | action\_id, incident\_id, type, target, params, risk, status (proposed, approved, rejected, expired) | Agent through MCP | Approval gate, dashboard |
@@ -76,7 +76,7 @@ Five records carry everything between components. They live in one shared `contr
 Three rules keep the contracts honest:
 
 1. **Labels live apart from metrics.** The scenario label for a failure is stored in a separate table that features and models cannot read. Only the eval harness joins it.
-2. **ONTAP shape.** The mock API uses ONTAP REST field names (uuid, name, space.size, space.used, svm.name, and so on). Responses captured from the NetApp lab, if the lab session works, become test fixtures that the mock must match.
+2. **ONTAP shape.** The mock API uses ONTAP REST field names (uuid, name, space.size, space.used, svm.name, and so on). Field names come only from NetApp's public ONTAP REST API documentation, and the mock is documented as a subset, not a full ONTAP emulator. Fixtures in tests/fixtures/ are hand-written from that documentation.
 3. **Audit chain.** Each AuditRecord stores the hash of the previous one, so edits to history are detectable.
 
 ## NetApp scenarios
@@ -94,7 +94,7 @@ Eight ONTAP failure types drive training and testing. Six are used for training 
 | 7 | Ransomware-like change pattern | Sudden spike in change rate and data entropy | Change rate, entropy proxy, snapshot growth | Raise alert and propose isolation steps for a human | Held out |
 | 8 | Trident PVC burst | Many PVCs provisioned quickly against one backend | PVC count rate, backend capacity | Throttle provisioning, add capacity | Held out |
 
-Each scenario has three parameter variants (mild, moderate, severe). One variant per training scenario is also held back for validation. Scenario 7 is an anomaly demonstration only and does not claim to reproduce any NetApp product behaviour. Scenario 8 is simulated unless the lab session validates a real Trident flow.
+Each scenario has three parameter variants (mild, moderate, severe). One variant per training scenario is also held back for validation. Scenario 7 is an anomaly demonstration only and does not claim to reproduce any NetApp product behaviour. Scenario 8 is simulated, and the README says so. It is the only scenario that uses the trident\_backend object type.
 
 ## ML and evaluation
 
@@ -161,7 +161,7 @@ The build takes about ten weeks alongside a full-time job, in three phases. Each
 
 | Phase | Weeks | Deliverables | Done when |
 | --- | --- | --- | --- |
-| 0. De-risk | Week 1 | One time-boxed NetApp lab session: capture real ONTAP REST responses into `tests/fixtures/`, try the Trident install. Create the repo, the `contracts/` package and the Compose skeleton. | Fixtures saved, or the lab marked as not validated. Contracts import cleanly everywhere. |
+| 0. Foundations | Week 1 | Create the repo, the `contracts/` package, the Makefile and CI, and the Compose skeleton. Hand-write ONTAP REST fixtures in `tests/fixtures/` from NetApp's public API documentation. | Contracts import cleanly everywhere and CI is green. Fixtures list only fields found in the public documentation. |
 | 1. Working core | Weeks 1 to 3 | Simulator, mock ONTAP API, scenario library (1 to 6), ingest, features, forecaster, MLflow, Streamlit dashboard | Clicking a scenario shows a forecast on the dashboard, and the forecaster beats the linear baseline on the validation variants. |
 | 2. Intelligence | Weeks 4 to 6 | Golden incident set, QLoRA summarizer, eval harness with the three-way comparison, CI promotion gate | CI blocks a deliberately worse model, and the comparison table is in the README. |
 | 3. Platform | Weeks 7 to 10 | API, MCP server, triage agent, approval and audit gate, Langfuse, Prometheus and Grafana, Evidently drift, retrain workflow, held-out scenarios 7 and 8, kind and Argo CD demo, Streamlit and Render live demo | Injected drift triggers retraining, no state change happens without a logged approval, and the recorded demo runs end to end. |
@@ -186,15 +186,14 @@ Everything runs locally with Docker Compose; a slim live demo runs on free hosti
 
 **Kubernetes and Argo CD, tested locally.** Create a kind cluster, install Argo CD into an `argocd` namespace, port-forward its UI, and point an Application at the Helm chart in `deploy/k8s/` in the public repo. The demo changes a value in Git and watches Argo sync, then edits the live deployment and watches Argo restore it.
 
-**Trident, three honest levels**
+**Trident, two honest levels**
 
 | Level | How | What the README may claim |
 | --- | --- | --- |
 | Simulated (default) | Mock ONTAP plus simulated PVC events, with a local storage class standing in for Trident in kind | Designed for Trident-backed clusters, simulated in the demo |
-| Lab-verified (optional) | Real Trident install, backend and PVC on the NetApp lab, with screenshots and captured REST responses | Validated against a real ONTAP and Trident in a NetApp lab |
-| Not tested | Neither of the above | Say so, or leave the claim out |
+| Real Trident (not claimed) | A real Trident install or any lab validation, which this project does not do | Nothing; the README says Trident is simulated |
 
-Lab sessions are time-limited and not persistent, so the week-1 session is scripted and its outputs saved as it runs. The lab's terms of use are checked before any captured output is published.
+All ONTAP behaviour comes from NetApp's public documentation and the mock is described as a subset, so the README never claims validation against a real array.
 
 ## Repo, risks and working rules
 
@@ -228,10 +227,10 @@ storageops/
 | Circular evaluation: the model learns the simulator | Hand-written golden set, held-out scenario types, type and time splits |
 | Scope creep over ten weeks | Phase deliverables are independent; follow the cut order |
 | No GPU for the fine-tune | Free Colab or Kaggle session, small model, QLoRA |
-| NetApp lab session fails or is unreachable | Simulated Trident level by default; lab validation is optional |
+| Mock drifts from real ONTAP behaviour | Build only from NetApp's public REST documentation, document the mock as a subset, and describe Trident as simulated |
 | Render cold starts spoil the demo | Waking message, recorded demo video as the fallback |
 | Heavy self-hosted observability stack | Self-host locally only; use hosted free tiers for the live demo |
-| Synthetic data looks unrealistic | Match the ONTAP REST shape against captured fixtures and explain the limits in the README |
+| Synthetic data looks unrealistic | Match the ONTAP REST shape to the public documentation and explain the limits in the README |
 
 **Working rules for Claude Code.** Put these in `CLAUDE.md`.
 
