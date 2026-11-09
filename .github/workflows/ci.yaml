@@ -8,6 +8,12 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v7
+      - name: No CRLF line endings
+        run: |
+          if git grep -I -l --cached -e "$(printf '\r')" -- . ; then
+            echo "ERROR: CRLF line endings in the files listed above; commit LF only"
+            exit 1
+          fi
       - uses: actions/setup-python@v7
         with:
           python-version: "3.11"
