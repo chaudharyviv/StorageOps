@@ -1,0 +1,23 @@
+# Value rules for ingest validation, one entry per metric in docs/METRICS.md.
+# `unit` must match the catalogue. `min` and `max` are inclusive; null means unbounded.
+# Bounds are deliberately generous: they catch impossible values (negative bytes, a percent
+# of 400, NaN-like blow-ups), not unusual-but-real behaviour such as a snapshot reserve at 200%.
+# A test keeps this file and docs/METRICS.md in step, so a new metric needs a rule here.
+metrics:
+  data.change_rate_percent: {unit: percent, min: 0, max: 100}
+  data.entropy_proxy: {unit: ratio, min: 0, max: 1}
+  efficiency.ratio: {unit: ratio, min: 1, max: 100}
+  iops: {unit: iops, min: 0, max: 10000000}
+  lag_seconds: {unit: seconds, min: 0, max: 10000000}
+  latency.read_p95_ms: {unit: ms, min: 0, max: 60000}
+  latency.write_p95_ms: {unit: ms, min: 0, max: 60000}
+  snapshot.reserve_used_percent: {unit: percent, min: 0, max: 1000}
+  snapshot.to_active_ratio: {unit: ratio, min: 0, max: 100}
+  snapshot.used_bytes: {unit: bytes, min: 0, max: 10000000000000000}
+  space.autogrow_max_bytes: {unit: bytes, min: 0, max: 10000000000000000}
+  space.logical_used_bytes: {unit: bytes, min: 0, max: 10000000000000000}
+  space.size_bytes: {unit: bytes, min: 0, max: 10000000000000000}
+  space.used_bytes: {unit: bytes, min: 0, max: 10000000000000000}
+  space.used_percent: {unit: percent, min: 0, max: 100}
+  throughput_mbps: {unit: MB/s, min: 0, max: 1000000}
+  transfer_errors: {unit: count, min: 0, max: 1000000}
