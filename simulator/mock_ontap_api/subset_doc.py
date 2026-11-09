@@ -90,8 +90,8 @@ SOURCES: dict[str, dict[str, str]] = {
         "policy.type": "constant (`async`)",
         "policy.uuid": "derived from the policy name",
         "unhealthy_reason[].arguments": "constant; present only when `transfer_errors` is above 0",
-        "unhealthy_reason[].code": "constant, from the reference's example",
-        "unhealthy_reason[].message": "constant, from the reference's example",
+        "unhealthy_reason[].code": "constant (a mock identifier, not an ONTAP code)",
+        "unhealthy_reason[].message": "constant (our own wording)",
     },
     "qos": {
         "uuid": "derived from the policy name",

@@ -55,9 +55,10 @@ SNAPSHOT_RESERVE_PERCENT = {
     for o in build_cluster()
     if o.object_type == ObjectType.VOLUME
 }
-# Example values lifted from the reference's own examples for a failed update transfer.
-UNHEALTHY_CODE = "6621444"
-UNHEALTHY_MESSAGE = "Failed to complete update operation on one or more item relationships."
+# Our own wording. The field structure (arguments, code, message) follows the reference; the
+# code is a mock identifier, not an ONTAP error code.
+UNHEALTHY_CODE = "MOCK-SM-0001"
+UNHEALTHY_MESSAGE = "The latest SnapMirror update did not finish; transfer errors were recorded."
 
 
 def _int(value: float) -> int:
