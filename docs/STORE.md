@@ -4,6 +4,9 @@ The DuckDB file written by `python -m ingest.run --store <db>`. It holds the val
 that features and models read, what validation rejected, and a record of each run. It is never
 the same file as the simulator's metrics file, and it holds no scenario labels.
 
+The features component adds a fourth table, `features`, to the same file; it is documented in
+`docs/FEATURES.md`.
+
 A test (`tests/test_ingest_store_doc.py`) compares this page with the real schema, so a change
 to a table must change this file too. Types are DuckDB's own names.
 

@@ -1,0 +1,90 @@
+# Feature definitions. docs/FEATURES.md is generated from this file; run
+# `python -m features.catalogue` after changing it. A test keeps the two, and the code, in step.
+#
+# Each entry is a template. It expands to one concrete feature per (object type, metric,
+# window) where the metric comes from docs/METRICS.md and the object types are the ones that
+# emit it. Names must contain {metric}, and {window} when the entry has windows.
+# A window of w minutes ending at t covers the samples at minutes t-w+1 ... t.
+
+version: 1
+
+windows:            # name -> length in minutes
+  15m: 15
+  1h: 60
+  6h: 360
+  24h: 1440
+
+defaults:
+  min_coverage: 0.5   # a window with fewer present samples than this share of its minutes gives null
+  level_window: 15m   # how far back "current level" may look for the latest sample
+
+features:
+  - name: "{metric}__level"
+    metrics: all
+    function: last
+    window: 15m
+
+  - name: "{metric}__mean_{window}"
+    metrics: all
+    exclude: [space.autogrow_max_bytes]
+    function: mean
+    windows: all
+
+  - name: "{metric}__min_{window}"
+    metrics: all
+    exclude: [space.autogrow_max_bytes]
+    function: min
+    windows: all
+
+  - name: "{metric}__max_{window}"
+    metrics: all
+    exclude: [space.autogrow_max_bytes]
+    function: max
+    windows: all
+
+  - name: "{metric}__std_{window}"
+    metrics: all
+    exclude: [space.autogrow_max_bytes]
+    function: std
+    windows: all
+
+  # Growth rate: least-squares slope per hour, in the metric's own unit. This is also the
+  # "trend" for ratios, latency and lag (see `coverage` below).
+  - name: "{metric}__slope_{window}"
+    metrics: all
+    exclude: [space.autogrow_max_bytes]
+    function: slope
+    windows: all
+
+  # Naive linear time-to-full for capacity metrics: minutes until the metric reaches `full`
+  # if it keeps rising at the window's slope. Capped at `cap_minutes` (30 days), which also
+  # stands for "not filling". Short 15m windows are left out: too noisy to extrapolate.
+  - name: "{metric}__ttf_{window}"
+    metrics: [space.used_percent, snapshot.reserve_used_percent]
+    function: time_to_full
+    windows: [1h, 6h, 24h]
+    params: {full: 100, cap_minutes: 43200}
+
+# Which features answer which question. A test checks that each entry resolves to real
+# features, and docs/FEATURES.md lists them.
+coverage:
+  current_level:
+    function: last
+  rolling_statistics:
+    function: [mean, min, max, std]
+  growth_rate:
+    function: slope
+  time_to_full:
+    function: time_to_full
+  snapshot_to_active_ratio_trend:
+    metrics: [snapshot.to_active_ratio]
+    function: slope
+  efficiency_ratio_trend:
+    metrics: [efficiency.ratio]
+    function: slope
+  latency_p95_trend:
+    metrics: [latency.read_p95_ms, latency.write_p95_ms]
+    function: slope
+  snapmirror_lag_trend:
+    metrics: [lag_seconds]
+    function: slope
