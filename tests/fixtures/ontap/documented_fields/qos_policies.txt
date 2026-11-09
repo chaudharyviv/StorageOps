@@ -1,0 +1,38 @@
+# Documented response fields: qos_policies.txt
+# Source: https://docs.netapp.com/us-en/ontap-restapi/get-storage-qos-policies.html
+# ONTAP 9.19.1 REST API reference (fetched 2026-11-09). Field paths and types only.
+# Extracted mechanically from the page's response schema; '[]' marks an array of objects.
+_links	object
+_links.self	object
+_links.self.href	string
+adaptive	object
+adaptive.absolute_min_iops	integer
+adaptive.block_size	string
+adaptive.expected_iops	integer
+adaptive.expected_iops_allocation	string
+adaptive.peak_iops	integer
+adaptive.peak_iops_allocation	string
+burst	object
+burst.duration	integer
+burst.iops	integer
+burst.percent	integer
+fixed	object
+fixed.capacity_shared	boolean
+fixed.max_throughput	string
+fixed.max_throughput_iops	integer
+fixed.max_throughput_mbps	integer
+fixed.min_throughput	string
+fixed.min_throughput_iops	integer
+fixed.min_throughput_mbps	integer
+name	string
+object_count	integer
+pgid	integer
+policy_class	string
+scope	string
+svm	object
+svm._links	object
+svm._links.self	object
+svm._links.self.href	string
+svm.name	string
+svm.uuid	string
+uuid	string

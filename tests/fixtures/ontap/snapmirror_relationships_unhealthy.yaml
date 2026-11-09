@@ -1,0 +1,31 @@
+# Hand-written fixture: GET /api/snapmirror/relationships, unhealthy relationship.
+# Source: https://docs.netapp.com/us-en/ontap-restapi/get-snapmirror-relationships.html  (ONTAP 9.19.1, "Response")
+# unhealthy_reason is documented as "Reason the relationship is not healthy" (array of
+# snapmirror_error: arguments, code, message); the values below follow the page's example.
+# Only the subset the mock serves. Values are illustrative; the key set is what tests compare.
+_links:
+  self:
+    href: /api/snapmirror/relationships
+num_records: 1
+records:
+  - uuid: 4ea7a442-86d1-11e0-ae1c-123478563412
+    source:
+      path: "svm1:vol02"
+      svm:
+        name: svm1
+    destination:
+      path: "svm1_dr:vol02_dr"
+      svm:
+        name: svm1_dr
+    state: snapmirrored
+    group_type: none
+    healthy: false
+    lag_time: PT8H35M42S
+    policy:
+      name: Asynchronous
+      type: async
+      uuid: 4ea7a442-86d1-11e0-ae1c-123478563412
+    unhealthy_reason:
+      - arguments: []
+        code: "6621444"
+        message: Failed to complete update operation on one or more item relationships.

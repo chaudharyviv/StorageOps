@@ -1,0 +1,21 @@
+# Hand-written fixture: GET /api/storage/qos/policies.
+# Source: https://docs.netapp.com/us-en/ontap-restapi/get-storage-qos-policies.html  (ONTAP 9.19.1, "Response")
+# The page documents policy configuration only (fixed, adaptive, burst, svm, ...); it documents
+# no latency, IOPS or throughput measurements for QoS policies.
+# Only the subset the mock serves. Values are illustrative; the key set is what tests compare.
+_links:
+  self:
+    href: /api/storage/qos/policies
+num_records: 1
+records:
+  - uuid: 1cd8a442-86d1-11e0-ae1c-123478563412
+    name: qos1
+    scope: svm
+    pgid: 1000
+    object_count: 5
+    svm:
+      name: svm1
+      uuid: 02c9e252-41be-11e9-81d5-00a0986138f7
+    fixed:
+      capacity_shared: false
+      max_throughput_iops: 15000

@@ -1,0 +1,17 @@
+# Hand-written fixture: GET /api/storage/aggregates (default fields).
+# Source: https://docs.netapp.com/us-en/ontap-restapi/get-storage-aggregates.html  (ONTAP 9.19.1, "Response")
+# Only the subset the mock serves. Values are illustrative; the key set is what tests compare.
+_links:
+  self:
+    href: /api/storage/aggregates
+num_records: 1
+records:
+  - uuid: 1cd8a442-86d1-11e0-ae1c-123478563412
+    name: aggr1
+    space:
+      block_storage:
+        size: 20000000000000
+        used: 11000000000000
+        available: 9000000000000
+        used_percent: 55
+    volume-count: 5

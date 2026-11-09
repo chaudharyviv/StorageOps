@@ -1,0 +1,13 @@
+# Hand-written fixture: GET /api/cluster (a single object, not a collection).
+# Source: https://docs.netapp.com/us-en/ontap-restapi/get-cluster.html  (ONTAP 9.19.1, "Response")
+# Only the subset the mock serves. Values are illustrative; the key set is what tests compare.
+_links:
+  self:
+    href: /api/cluster
+name: cluster1
+uuid: 1cd8a442-86d1-11e0-ae1c-123478563412
+version:
+  full: "NetApp Release 9.19.1 (mock)"
+  generation: 9
+  major: 19
+  minor: 1

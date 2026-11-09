@@ -1,0 +1,31 @@
+# Shared cluster topology: which objects exist and how they relate.
+# Read by the simulator (to build the cluster) and by the mock ONTAP API (to serve relations).
+# Configuration only: no telemetry values and nothing about scenarios. All of it is synthetic.
+cluster: sim-cluster-01
+svm: svm1
+dr_svm: svm1_dr
+
+aggregates:
+  - aggr1
+  - aggr2
+
+# Order matters: the simulator derives each volume's size and load from its position.
+volumes:
+  - {id: vol01, aggregate: aggr1, qos_policy: qos1}
+  - {id: vol02, aggregate: aggr1, qos_policy: qos1}
+  - {id: vol03, aggregate: aggr1, qos_policy: qos1}
+  - {id: vol04, aggregate: aggr1, qos_policy: qos1}
+  - {id: vol05, aggregate: aggr1, qos_policy: qos1}
+  - {id: vol06, aggregate: aggr2, qos_policy: qos2}
+  - {id: vol07, aggregate: aggr2, qos_policy: qos2}
+  - {id: vol08, aggregate: aggr2, qos_policy: qos2}
+  - {id: vol09, aggregate: aggr2, qos_policy: qos2}
+  - {id: vol10, aggregate: aggr2, qos_policy: qos2}
+
+snapmirror:
+  - {id: sm1, source_volume: vol02}
+  - {id: sm2, source_volume: vol07}
+
+qos_policies:
+  - {id: qos1, max_throughput_iops: 15000}
+  - {id: qos2, max_throughput_iops: 12000}

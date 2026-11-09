@@ -1,0 +1,26 @@
+# Hand-written fixture: GET /api/storage/volumes with default fields.
+# Source: https://docs.netapp.com/us-en/ontap-restapi/get-storage-volumes.html  (ONTAP 9.19.1, "Response")
+# The page lists autosize.*, efficiency.*, qos.*, metric.*, space.logical_space.*, space.snapshot.*,
+# space.physical_used, space.physical_used_percent and space.percent_used as expensive properties,
+# so they are absent here; see volumes_all_fields.yaml for the `fields=**` response.
+# Only the subset the mock serves. Values are illustrative; the key set is what tests compare.
+_links:
+  self:
+    href: /api/storage/volumes
+num_records: 1
+records:
+  - uuid: 028baa66-41bd-11e9-81d5-00a0986138f7
+    name: vol01
+    state: online
+    type: rw
+    size: 2000000000000
+    svm:
+      name: svm1
+      uuid: 02c9e252-41be-11e9-81d5-00a0986138f7
+    aggregates:
+      - name: aggr1
+        uuid: 1cd8a442-86d1-11e0-ae1c-123478563412
+    space:
+      size: 2000000000000
+      used: 1100000000000
+      available: 900000000000

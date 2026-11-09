@@ -1,0 +1,49 @@
+# Hand-written fixture: GET /api/storage/volumes?fields=**  (every property the mock serves).
+# Source: https://docs.netapp.com/us-en/ontap-restapi/get-storage-volumes.html  (ONTAP 9.19.1, "Response")
+# `**` is the documented way to request expensive properties along with the default ones.
+# Only the subset the mock serves. Values are illustrative; the key set is what tests compare.
+_links:
+  self:
+    href: /api/storage/volumes
+num_records: 1
+records:
+  - uuid: 028baa66-41bd-11e9-81d5-00a0986138f7
+    name: vol01
+    state: online
+    type: rw
+    size: 2000000000000
+    svm:
+      name: svm1
+      uuid: 02c9e252-41be-11e9-81d5-00a0986138f7
+    aggregates:
+      - name: aggr1
+        uuid: 1cd8a442-86d1-11e0-ae1c-123478563412
+    space:
+      size: 2000000000000
+      used: 1100000000000
+      available: 900000000000
+      percent_used: 55
+      physical_used: 1100000000000
+      physical_used_percent: 55
+      logical_space:
+        used: 1900000000000
+      snapshot:
+        used: 40000000000
+        reserve_percent: 10
+        reserve_size: 200000000000
+        space_used_percent: 20
+    autosize:
+      mode: grow
+      maximum: 4000000000000
+      grow_threshold: 85
+    efficiency:
+      ratio: 1.7
+    qos:
+      policy:
+        name: qos1
+        uuid: 1cd8a442-86d1-11e0-ae1c-123478563412
+    metric:
+      status: ok
+      timestamp: "2017-01-25 11:20:13 +0000"
+      iops:
+        total: 1000

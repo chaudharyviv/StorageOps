@@ -4,3 +4,9 @@ __pycache__/
 .mypy_cache/
 .ruff_cache/
 .pytest_cache/
+
+# Saved copies of third-party documentation pages (e.g. NetApp ONTAP REST reference) are
+# never committed; only the field-path lists under tests/fixtures/ontap/documented_fields/ are.
+/netapp_pages/
+**/saved_pages/
+*.rows.txt

@@ -9,6 +9,7 @@ dependencies = [
     "polars",
     "duckdb",
     "fastapi",
+    "uvicorn",
     "numpy",
     "pyyaml",
 ]
@@ -19,6 +20,7 @@ dev = [
     "mypy",
     "pytest",
     "types-PyYAML",
+    "httpx",
 ]
 
 [build-system]
@@ -56,3 +58,6 @@ plugins = ["pydantic.mypy"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+markers = [
+    "smoke: starts a real server on a local port; skip with -m \"not smoke\"",
+]

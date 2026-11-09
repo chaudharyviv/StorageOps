@@ -9,8 +9,9 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 
 from contracts import ObjectType
+from simulator.topology import get_topology
 
-CLUSTER = "sim-cluster-01"
+CLUSTER = get_topology().cluster
 MINUTES_PER_DAY = 1440
 TB = 1e12
 
@@ -56,14 +57,14 @@ def _aggregate(object_id: str, used_tb: float) -> ObjectSpec:
     )
 
 
-def _volume(index: int) -> ObjectSpec:
+def _volume(index: int, object_id: str) -> ObjectSpec:
     """Volume sizes and loads vary by index so the ten volumes are not clones."""
     size = float((index % 4) + 1) * TB
     used = size * (0.50 + 0.04 * (index % 5))
     ratio = 1.6 + 0.1 * (index % 5)
     return ObjectSpec(
         ObjectType.VOLUME,
-        f"vol{index:02d}",
+        object_id,
         (
             MetricSpec(
                 "space.logical_used_bytes",
@@ -124,13 +125,15 @@ def _qos(object_id: str, scale: float) -> ObjectSpec:
 
 
 def build_cluster() -> tuple[ObjectSpec, ...]:
-    """Return the healthy cluster: 2 aggregates, 10 volumes, 2 SnapMirror, 2 QoS policies."""
+    """Return the healthy cluster described by simulator/topology.yaml.
+
+    The topology says which objects exist. Sizes and loads come from each object's position
+    in its list, so the same topology always gives the same cluster.
+    """
+    topo = get_topology()
     return (
-        _aggregate("aggr1", 11.0),
-        _aggregate("aggr2", 12.0),
-        *(_volume(i) for i in range(1, 11)),
-        _snapmirror("sm1"),
-        _snapmirror("sm2"),
-        _qos("qos1", 1.0),
-        _qos("qos2", 0.8),
+        *(_aggregate(name, 11.0 + position) for position, name in enumerate(topo.aggregates)),
+        *(_volume(position + 1, v.id) for position, v in enumerate(topo.volumes)),
+        *(_snapmirror(s.id) for s in topo.snapmirror),
+        *(_qos(q.id, 1.0 - 0.2 * position) for position, q in enumerate(topo.qos_policies)),
     )
