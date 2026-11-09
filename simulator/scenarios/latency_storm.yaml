@@ -1,0 +1,48 @@
+# Scenario 4: a noisy neighbour on qos1 pushes latency up in bursts.
+scenario: latency_storm
+description: vol02 floods the shared qos1 policy; qos1 latency spikes every six hours.
+duration_minutes: 10080
+effects:
+  - target: {object_type: qos, object_id: qos1, metric: latency.read_p95_ms}
+    pattern: spike
+    start_minute: 2880
+    magnitude: $read_spike_ms
+    width_minutes: 90
+    period_minutes: 360
+  - target: {object_type: qos, object_id: qos1, metric: latency.write_p95_ms}
+    pattern: spike
+    start_minute: 2880
+    magnitude: $write_spike_ms
+    width_minutes: 90
+    period_minutes: 360
+  - target: {object_type: qos, object_id: qos1, metric: latency.read_p95_ms}
+    pattern: noise
+    start_minute: 2880
+    sigma: $latency_noise_ms
+  - target: {object_type: qos, object_id: qos1, metric: iops}
+    pattern: step
+    mode: multiply
+    start_minute: 2880
+    magnitude: $iops_factor
+  - target: {object_type: qos, object_id: qos1, metric: throughput_mbps}
+    pattern: step
+    mode: multiply
+    start_minute: 2880
+    magnitude: $throughput_factor
+  - target: {object_type: volume, object_id: vol02, metric: iops}
+    pattern: step
+    mode: multiply
+    start_minute: 2880
+    magnitude: $noisy_volume_factor
+labels:
+  - {object_id: qos1, start_minute: 2880}
+variants:
+  mild:
+    split: train
+    params: {read_spike_ms: 8, write_spike_ms: 12, latency_noise_ms: 1, iops_factor: 0.3, throughput_factor: 0.2, noisy_volume_factor: 2}
+  moderate:
+    split: validation
+    params: {read_spike_ms: 20, write_spike_ms: 30, latency_noise_ms: 3, iops_factor: 0.6, throughput_factor: 0.4, noisy_volume_factor: 4}
+  severe:
+    split: train
+    params: {read_spike_ms: 50, write_spike_ms: 75, latency_noise_ms: 8, iops_factor: 1.0, throughput_factor: 0.8, noisy_volume_factor: 8}

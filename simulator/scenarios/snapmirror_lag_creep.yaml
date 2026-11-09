@@ -1,0 +1,29 @@
+# Scenario 5: a replication relationship falls behind its one-hour RPO.
+scenario: snapmirror_lag_creep
+description: sm1 lag grows past the RPO and transfer errors start to accumulate.
+duration_minutes: 10080
+effects:
+  - target: {object_type: snapmirror, object_id: sm1, metric: lag_seconds}
+    pattern: drift
+    magnitude: 60
+  - target: {object_type: snapmirror, object_id: sm1, metric: lag_seconds}
+    pattern: exponential_ramp
+    start_minute: 2880
+    magnitude: $lag_growth_seconds
+    shape: 3
+  - target: {object_type: snapmirror, object_id: sm1, metric: transfer_errors}
+    pattern: linear_ramp
+    start_minute: 2880
+    magnitude: $error_growth
+labels:
+  - {object_id: sm1, start_minute: 2880}
+variants:
+  mild:
+    split: train
+    params: {lag_growth_seconds: 3600, error_growth: 2}
+  moderate:
+    split: validation
+    params: {lag_growth_seconds: 9000, error_growth: 6}
+  severe:
+    split: train
+    params: {lag_growth_seconds: 21600, error_growth: 15}

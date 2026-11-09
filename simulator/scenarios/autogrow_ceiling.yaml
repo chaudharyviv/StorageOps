@@ -1,0 +1,22 @@
+# Scenario 3: a volume reaches its autogrow maximum while the aggregate still has space.
+# vol05 is 2 TB with a 4 TB autogrow maximum; it needs about 4.8 TB of extra logical data.
+scenario: autogrow_ceiling
+description: vol05 grows through its autogrow steps and stops at the maximum size.
+duration_minutes: 10080
+effects:
+  - target: {object_type: volume, object_id: vol05, metric: space.logical_used_bytes}
+    pattern: linear_ramp
+    start_minute: 1440
+    magnitude: $logical_growth_bytes
+labels:
+  - {object_id: vol05, start_minute: 1440}
+variants:
+  mild:
+    split: train
+    params: {logical_growth_bytes: 5500000000000}
+  moderate:
+    split: validation
+    params: {logical_growth_bytes: 7000000000000}
+  severe:
+    split: train
+    params: {logical_growth_bytes: 10000000000000}

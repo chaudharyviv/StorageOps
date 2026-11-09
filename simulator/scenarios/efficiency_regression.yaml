@@ -1,0 +1,39 @@
+# Scenario 6: dedupe and compression savings drop after a workload change.
+# A multiply of -0.3 scales the efficiency ratio by 0.7, so physical use rises by about 43%.
+scenario: efficiency_regression
+description: vol04 and vol08 lose storage efficiency savings after a workload change.
+duration_minutes: 10080
+effects:
+  - target: {object_type: volume, object_id: vol04, metric: efficiency.ratio}
+    pattern: step
+    mode: multiply
+    start_minute: 2880
+    magnitude: $ratio_change
+  - target: {object_type: volume, object_id: vol08, metric: efficiency.ratio}
+    pattern: step
+    mode: multiply
+    start_minute: 2880
+    magnitude: $ratio_change
+  - target: {object_type: volume, object_id: vol04, metric: data.change_rate_percent}
+    pattern: step
+    mode: multiply
+    start_minute: 2880
+    magnitude: 0.5
+  - target: {object_type: volume, object_id: vol08, metric: data.change_rate_percent}
+    pattern: step
+    mode: multiply
+    start_minute: 2880
+    magnitude: 0.5
+labels:
+  - {object_id: vol04, start_minute: 2880}
+  - {object_id: vol08, start_minute: 2880}
+variants:
+  mild:
+    split: train
+    params: {ratio_change: -0.15}
+  moderate:
+    split: validation
+    params: {ratio_change: -0.3}
+  severe:
+    split: train
+    params: {ratio_change: -0.5}

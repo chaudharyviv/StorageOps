@@ -1,0 +1,30 @@
+# Scenario 1: steady volume growth fills one aggregate.
+# aggr1 starts at 11 TB of 20 TB. Growth begins on day 1; severe grows exponentially.
+scenario: aggregate_filling
+description: Steady volume growth on aggr1 drives its used percent toward full.
+duration_minutes: 10080
+effects:
+  - target: {object_type: aggregate, object_id: aggr1, metric: space.used_bytes}
+    pattern: $growth_pattern
+    start_minute: 1440
+    magnitude: $aggregate_growth_bytes
+  - target: {object_type: volume, object_id: vol01, metric: space.logical_used_bytes}
+    pattern: $growth_pattern
+    start_minute: 1440
+    magnitude: $volume_growth_bytes
+  - target: {object_type: volume, object_id: vol02, metric: space.logical_used_bytes}
+    pattern: $growth_pattern
+    start_minute: 1440
+    magnitude: $volume_growth_bytes
+labels:
+  - {object_id: aggr1, start_minute: 1440}
+variants:
+  mild:
+    split: train
+    params: {growth_pattern: linear_ramp, aggregate_growth_bytes: 2000000000000, volume_growth_bytes: 100000000000}
+  moderate:
+    split: validation
+    params: {growth_pattern: linear_ramp, aggregate_growth_bytes: 5000000000000, volume_growth_bytes: 300000000000}
+  severe:
+    split: train
+    params: {growth_pattern: exponential_ramp, aggregate_growth_bytes: 9000000000000, volume_growth_bytes: 600000000000}

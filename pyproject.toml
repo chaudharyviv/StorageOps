@@ -9,6 +9,8 @@ dependencies = [
     "polars",
     "duckdb",
     "fastapi",
+    "numpy",
+    "pyyaml",
 ]
 
 [project.optional-dependencies]
@@ -16,6 +18,7 @@ dev = [
     "ruff",
     "mypy",
     "pytest",
+    "types-PyYAML",
 ]
 
 [build-system]

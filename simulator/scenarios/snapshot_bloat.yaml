@@ -1,0 +1,28 @@
+# Scenario 2: a high change-rate volume eats its snapshot reserve.
+# vol03 has a 400 GB reserve and starts near 25% used.
+scenario: snapshot_bloat
+description: vol03 change rate jumps and its snapshots grow past the snapshot reserve.
+duration_minutes: 10080
+effects:
+  - target: {object_type: volume, object_id: vol03, metric: snapshot.used_bytes}
+    pattern: exponential_ramp
+    start_minute: 1440
+    magnitude: $snapshot_growth_bytes
+    shape: 3
+  - target: {object_type: volume, object_id: vol03, metric: data.change_rate_percent}
+    pattern: step
+    mode: multiply
+    start_minute: 1440
+    magnitude: $change_rate_factor
+labels:
+  - {object_id: vol03, start_minute: 1440}
+variants:
+  mild:
+    split: train
+    params: {snapshot_growth_bytes: 150000000000, change_rate_factor: 1.0}
+  moderate:
+    split: validation
+    params: {snapshot_growth_bytes: 350000000000, change_rate_factor: 2.0}
+  severe:
+    split: train
+    params: {snapshot_growth_bytes: 700000000000, change_rate_factor: 4.0}
