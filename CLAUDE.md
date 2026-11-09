@@ -20,6 +20,7 @@ a triage agent with an approval and audit gate, and a drift-to-retrain loop.
 ## How to work
 - Write tests alongside the code. Run `make test` and `make lint` before finishing, and report the result.
 - Keep functions small and typed. Public functions get a one-line docstring.
+- Write files with LF newlines, never CRLF (on Windows, pass `newline="\n"` when writing text from Python); CI fails on CRLF.
 - Keep commits small: one component or one fix each. Message format: `component: what changed`.
 - If the design doc is unclear or contradicts the code, stop and ask instead of guessing.
 - End each session with: what was built, what was tested, what is left, and any open question.
