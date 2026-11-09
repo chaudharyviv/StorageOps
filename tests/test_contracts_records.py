@@ -10,6 +10,7 @@ from contracts import (
     Alert,
     Incident,
     MetricRecord,
+    ObjectType,
     ProposedAction,
     ScenarioLabel,
 )
@@ -60,6 +61,29 @@ def test_metric_record_valid() -> None:
 def test_metric_record_rejects_bad_values(overrides: dict[str, Any]) -> None:
     with pytest.raises(ValidationError):
         MetricRecord(**metric(**overrides))
+
+
+def test_metric_record_accepts_trident_backend() -> None:
+    record = MetricRecord(
+        **metric(object_type="trident_backend", object_id="ontap-nas-01", metric="pvc_count")
+    )
+    assert record.object_type is ObjectType.TRIDENT_BACKEND
+
+
+def test_object_types_are_exact() -> None:
+    assert {t.value for t in ObjectType} == {
+        "aggregate",
+        "volume",
+        "snapmirror",
+        "qos",
+        "trident_backend",
+    }
+
+
+@pytest.mark.parametrize("bad_type", ["pvc", "trident", "TRIDENT_BACKEND"])
+def test_metric_record_rejects_per_pvc_object_type(bad_type: str) -> None:
+    with pytest.raises(ValidationError):
+        MetricRecord(**metric(object_type=bad_type))
 
 
 def test_metric_record_has_no_label_field() -> None:

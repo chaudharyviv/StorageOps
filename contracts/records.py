@@ -21,6 +21,9 @@ class ObjectType(StrEnum):
     VOLUME = "volume"
     SNAPMIRROR = "snapmirror"
     QOS = "qos"
+    # Used only by held-out scenario 8 (Trident PVC burst); scenarios 1 to 6 emit no
+    # trident_backend records. Metrics are per backend, not per PVC.
+    TRIDENT_BACKEND = "trident_backend"
 
 
 class AlertSource(StrEnum):
