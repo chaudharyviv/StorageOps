@@ -1,0 +1,14 @@
+# Local stack for StorageOps. Intentionally empty: no services are defined yet.
+#
+# Services to be added:
+#   - simulator      (generator and mock ONTAP API)
+#   - ingest         (queue and validation)
+#   - features       (feature jobs)
+#   - mlflow         (experiment tracking and model registry)
+#   - api            (FastAPI front door)
+#   - mcp-server     (ONTAP-style tools)
+#   - agent          (LangGraph triage agent)
+#   - langfuse       (LLM tracing)
+#   - prometheus     (metrics)
+#   - grafana        (dashboards)
+#   - evidently      (drift monitoring jobs)
