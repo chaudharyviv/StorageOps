@@ -31,6 +31,19 @@ agent/ governance/ ui/ monitoring/ deploy/ tests/fixtures/ docs/ .github/workflo
 ```
 
 ## Commands
+The project venv (`.venv`) must be active before running anything below; the tools and
+dependencies are installed only there. On Windows, activate it from the repo root:
+- PowerShell: `.venv\Scripts\Activate.ps1`
+- cmd: `.venv\Scripts\activate.bat`
+- Git Bash: `source .venv/Scripts/activate`
+
 - `make test`: run the test suite
 - `make lint`: lint and type-check
 - `docker compose -f deploy/local/compose.yaml up`: run the local stack
+
+If `make` is not installed (common on Windows), run the Makefile's underlying commands directly:
+- `make test` is `python -m pytest`
+- `make lint` is these three, in order:
+  - `python -m ruff check .`
+  - `python -m ruff format --check .`
+  - `python -m mypy .`
