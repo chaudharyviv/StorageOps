@@ -106,6 +106,10 @@ SOURCES: dict[str, dict[str, str]] = {
     },
 }
 
+TRIDENT_REASON = (
+    "Trident backend metrics come from Trident/Kubernetes and are simulated only; "
+    "ONTAP REST has no endpoint."
+)
 UNSERVED_REASONS = {
     "data.change_rate_percent": "No documented volume field for a change-rate percentage.",
     "data.entropy_proxy": (
@@ -118,6 +122,9 @@ UNSERVED_REASONS = {
         "Compute it from `space.snapshot.used` and `space.used`."
     ),
     "throughput_mbps": "The QoS policies endpoint documents configuration only.",
+    "trident.backend_used_percent": TRIDENT_REASON,
+    "trident.pvc_count": TRIDENT_REASON,
+    "trident.pvc_provisioning_rate": TRIDENT_REASON,
 }
 
 

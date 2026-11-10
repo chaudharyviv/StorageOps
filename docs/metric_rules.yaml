@@ -21,3 +21,6 @@ metrics:
   space.used_percent: {unit: percent, min: 0, max: 100}
   throughput_mbps: {unit: MB/s, min: 0, max: 1000000}
   transfer_errors: {unit: count, min: 0, max: 1000000}
+  trident.backend_used_percent: {unit: percent, min: 0, max: 100}
+  trident.pvc_count: {unit: count, min: 0, max: 12000}
+  trident.pvc_provisioning_rate: {unit: per_minute, min: 0, max: 1000}

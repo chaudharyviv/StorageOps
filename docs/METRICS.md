@@ -25,3 +25,6 @@ fails if it drifts from what the simulator emits, including metrics declared by 
 | `space.used_percent` | percent | aggregate, volume |
 | `throughput_mbps` | MB/s | qos |
 | `transfer_errors` | count | snapmirror |
+| `trident.backend_used_percent` | percent | trident_backend |
+| `trident.pvc_count` | count | trident_backend |
+| `trident.pvc_provisioning_rate` | per_minute | trident_backend |

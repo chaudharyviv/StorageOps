@@ -150,6 +150,9 @@ Not served, but would need a unit conversion if it were:
 | `latency.write_p95_ms` | The QoS policies endpoint documents configuration only. |
 | `snapshot.to_active_ratio` | Derived ratio; no documented field. Compute it from `space.snapshot.used` and `space.used`. |
 | `throughput_mbps` | The QoS policies endpoint documents configuration only. |
+| `trident.backend_used_percent` | Trident backend metrics come from Trident/Kubernetes and are simulated only; ONTAP REST has no endpoint. |
+| `trident.pvc_count` | Trident backend metrics come from Trident/Kubernetes and are simulated only; ONTAP REST has no endpoint. |
+| `trident.pvc_provisioning_rate` | Trident backend metrics come from Trident/Kubernetes and are simulated only; ONTAP REST has no endpoint. |
 | `iops` (QoS policies only) | Volume `iops` is served as `metric.iops.total`; the QoS policies endpoint documents configuration only. |
 
 ## Unclear points in the reference

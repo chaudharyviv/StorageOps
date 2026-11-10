@@ -54,9 +54,9 @@ Written to the ingest store by `python -m features.run --store <db> --step 5`. C
 
 | Need | Function | Metrics | Features |
 | --- | --- | --- | --- |
-| current_level | `last` | 17 metrics | 17 |
-| rolling_statistics | `mean`, `min`, `max`, `std` | 16 metrics | 256 |
-| growth_rate | `slope` | 16 metrics | 64 |
+| current_level | `last` | 20 metrics | 20 |
+| rolling_statistics | `mean`, `min`, `max`, `std` | 19 metrics | 304 |
+| growth_rate | `slope` | 19 metrics | 76 |
 | time_to_full | `time_to_full` | `snapshot.reserve_used_percent`, `space.used_percent` | 6 |
 | snapshot_to_active_ratio_trend | `slope` | `snapshot.to_active_ratio` | 4 |
 | efficiency_ratio_trend | `slope` | `efficiency.ratio` | 4 |
@@ -283,6 +283,74 @@ Written to the ingest store by `python -m features.run --store <db> --step 5`. C
 | `transfer_errors__std_1h` | `transfer_errors` | `std` | 1h |  |
 | `transfer_errors__std_24h` | `transfer_errors` | `std` | 24h |  |
 | `transfer_errors__std_6h` | `transfer_errors` | `std` | 6h |  |
+
+### trident_backend (63 features)
+
+| Feature | Source metric | Function | Window | Parameters |
+| --- | --- | --- | --- | --- |
+| `trident.backend_used_percent__level` | `trident.backend_used_percent` | `last` | 15m |  |
+| `trident.backend_used_percent__max_15m` | `trident.backend_used_percent` | `max` | 15m |  |
+| `trident.backend_used_percent__max_1h` | `trident.backend_used_percent` | `max` | 1h |  |
+| `trident.backend_used_percent__max_24h` | `trident.backend_used_percent` | `max` | 24h |  |
+| `trident.backend_used_percent__max_6h` | `trident.backend_used_percent` | `max` | 6h |  |
+| `trident.backend_used_percent__mean_15m` | `trident.backend_used_percent` | `mean` | 15m |  |
+| `trident.backend_used_percent__mean_1h` | `trident.backend_used_percent` | `mean` | 1h |  |
+| `trident.backend_used_percent__mean_24h` | `trident.backend_used_percent` | `mean` | 24h |  |
+| `trident.backend_used_percent__mean_6h` | `trident.backend_used_percent` | `mean` | 6h |  |
+| `trident.backend_used_percent__min_15m` | `trident.backend_used_percent` | `min` | 15m |  |
+| `trident.backend_used_percent__min_1h` | `trident.backend_used_percent` | `min` | 1h |  |
+| `trident.backend_used_percent__min_24h` | `trident.backend_used_percent` | `min` | 24h |  |
+| `trident.backend_used_percent__min_6h` | `trident.backend_used_percent` | `min` | 6h |  |
+| `trident.backend_used_percent__slope_15m` | `trident.backend_used_percent` | `slope` | 15m |  |
+| `trident.backend_used_percent__slope_1h` | `trident.backend_used_percent` | `slope` | 1h |  |
+| `trident.backend_used_percent__slope_24h` | `trident.backend_used_percent` | `slope` | 24h |  |
+| `trident.backend_used_percent__slope_6h` | `trident.backend_used_percent` | `slope` | 6h |  |
+| `trident.backend_used_percent__std_15m` | `trident.backend_used_percent` | `std` | 15m |  |
+| `trident.backend_used_percent__std_1h` | `trident.backend_used_percent` | `std` | 1h |  |
+| `trident.backend_used_percent__std_24h` | `trident.backend_used_percent` | `std` | 24h |  |
+| `trident.backend_used_percent__std_6h` | `trident.backend_used_percent` | `std` | 6h |  |
+| `trident.pvc_count__level` | `trident.pvc_count` | `last` | 15m |  |
+| `trident.pvc_count__max_15m` | `trident.pvc_count` | `max` | 15m |  |
+| `trident.pvc_count__max_1h` | `trident.pvc_count` | `max` | 1h |  |
+| `trident.pvc_count__max_24h` | `trident.pvc_count` | `max` | 24h |  |
+| `trident.pvc_count__max_6h` | `trident.pvc_count` | `max` | 6h |  |
+| `trident.pvc_count__mean_15m` | `trident.pvc_count` | `mean` | 15m |  |
+| `trident.pvc_count__mean_1h` | `trident.pvc_count` | `mean` | 1h |  |
+| `trident.pvc_count__mean_24h` | `trident.pvc_count` | `mean` | 24h |  |
+| `trident.pvc_count__mean_6h` | `trident.pvc_count` | `mean` | 6h |  |
+| `trident.pvc_count__min_15m` | `trident.pvc_count` | `min` | 15m |  |
+| `trident.pvc_count__min_1h` | `trident.pvc_count` | `min` | 1h |  |
+| `trident.pvc_count__min_24h` | `trident.pvc_count` | `min` | 24h |  |
+| `trident.pvc_count__min_6h` | `trident.pvc_count` | `min` | 6h |  |
+| `trident.pvc_count__slope_15m` | `trident.pvc_count` | `slope` | 15m |  |
+| `trident.pvc_count__slope_1h` | `trident.pvc_count` | `slope` | 1h |  |
+| `trident.pvc_count__slope_24h` | `trident.pvc_count` | `slope` | 24h |  |
+| `trident.pvc_count__slope_6h` | `trident.pvc_count` | `slope` | 6h |  |
+| `trident.pvc_count__std_15m` | `trident.pvc_count` | `std` | 15m |  |
+| `trident.pvc_count__std_1h` | `trident.pvc_count` | `std` | 1h |  |
+| `trident.pvc_count__std_24h` | `trident.pvc_count` | `std` | 24h |  |
+| `trident.pvc_count__std_6h` | `trident.pvc_count` | `std` | 6h |  |
+| `trident.pvc_provisioning_rate__level` | `trident.pvc_provisioning_rate` | `last` | 15m |  |
+| `trident.pvc_provisioning_rate__max_15m` | `trident.pvc_provisioning_rate` | `max` | 15m |  |
+| `trident.pvc_provisioning_rate__max_1h` | `trident.pvc_provisioning_rate` | `max` | 1h |  |
+| `trident.pvc_provisioning_rate__max_24h` | `trident.pvc_provisioning_rate` | `max` | 24h |  |
+| `trident.pvc_provisioning_rate__max_6h` | `trident.pvc_provisioning_rate` | `max` | 6h |  |
+| `trident.pvc_provisioning_rate__mean_15m` | `trident.pvc_provisioning_rate` | `mean` | 15m |  |
+| `trident.pvc_provisioning_rate__mean_1h` | `trident.pvc_provisioning_rate` | `mean` | 1h |  |
+| `trident.pvc_provisioning_rate__mean_24h` | `trident.pvc_provisioning_rate` | `mean` | 24h |  |
+| `trident.pvc_provisioning_rate__mean_6h` | `trident.pvc_provisioning_rate` | `mean` | 6h |  |
+| `trident.pvc_provisioning_rate__min_15m` | `trident.pvc_provisioning_rate` | `min` | 15m |  |
+| `trident.pvc_provisioning_rate__min_1h` | `trident.pvc_provisioning_rate` | `min` | 1h |  |
+| `trident.pvc_provisioning_rate__min_24h` | `trident.pvc_provisioning_rate` | `min` | 24h |  |
+| `trident.pvc_provisioning_rate__min_6h` | `trident.pvc_provisioning_rate` | `min` | 6h |  |
+| `trident.pvc_provisioning_rate__slope_15m` | `trident.pvc_provisioning_rate` | `slope` | 15m |  |
+| `trident.pvc_provisioning_rate__slope_1h` | `trident.pvc_provisioning_rate` | `slope` | 1h |  |
+| `trident.pvc_provisioning_rate__slope_24h` | `trident.pvc_provisioning_rate` | `slope` | 24h |  |
+| `trident.pvc_provisioning_rate__slope_6h` | `trident.pvc_provisioning_rate` | `slope` | 6h |  |
+| `trident.pvc_provisioning_rate__std_15m` | `trident.pvc_provisioning_rate` | `std` | 15m |  |
+| `trident.pvc_provisioning_rate__std_1h` | `trident.pvc_provisioning_rate` | `std` | 1h |  |
+| `trident.pvc_provisioning_rate__std_24h` | `trident.pvc_provisioning_rate` | `std` | 24h |  |
+| `trident.pvc_provisioning_rate__std_6h` | `trident.pvc_provisioning_rate` | `std` | 6h |  |
 
 ### volume (238 features)
 

@@ -1,0 +1,100 @@
+# Scenario 8: Trident PVC burst (held-out).
+# A burst of PVC provisioning (CI run / namespace spin-up) lasting a few hours
+# drives the trident_backend used percent up and produces a secondary rise on
+# the backing aggregate. After the burst the backend remains fuller than its
+# pre-burst baseline; PVC count plateaus at the new higher level.
+# The healthy cluster emits no trident_backend records. The backend and its
+# three metrics are declared here via extra_objects.
+# Note: nothing in the current code ties trident1 to aggr2. The mapping is an
+# author decision for this scenario; the agent's evidence tool will need that
+# association later (backlog item).
+scenario: trident_pvc_burst
+description: >
+  Burst of Trident PVC provisioning against one backend lasting hours; PVC
+  count and provisioning rate rise, backend used percent climbs, aggregate
+  used bytes rise more slowly. Burst ends while the backend stays elevated.
+duration_minutes: 10080
+extra_objects:
+  - object_type: trident_backend
+    object_id: trident1
+    metrics:
+      - {name: trident.backend_used_percent, unit: percent, base: 38, noise_sigma: 0.3, floor: 0, ceiling: 100}
+      - {name: trident.pvc_count, unit: count, base: 120, noise_sigma: 0.5, floor: 0}
+      - {name: trident.pvc_provisioning_rate, unit: per_minute, base: 0.3, noise_sigma: 0.05, floor: 0}
+effects:
+  # Provisioning rate: add at burst start, subtract the same amount at burst end
+  # so the rate returns to baseline (avoids compounding multiply on a near-zero base).
+  - target: {object_type: trident_backend, object_id: trident1, metric: trident.pvc_provisioning_rate}
+    pattern: step
+    mode: add
+    start_minute: $burst_start
+    magnitude: $rate_add
+  - target: {object_type: trident_backend, object_id: trident1, metric: trident.pvc_provisioning_rate}
+    pattern: step
+    mode: add
+    start_minute: $burst_end
+    magnitude: $rate_drop
+
+  # PVC count climbs during the burst then plateaus (no deletions).
+  - target: {object_type: trident_backend, object_id: trident1, metric: trident.pvc_count}
+    pattern: linear_ramp
+    start_minute: $burst_start
+    duration_minutes: $burst_minutes
+    magnitude: $pvc_growth
+
+  # Backend used percent climbs during the burst then holds.
+  - target: {object_type: trident_backend, object_id: trident1, metric: trident.backend_used_percent}
+    pattern: linear_ramp
+    start_minute: $burst_start
+    duration_minutes: $burst_minutes
+    magnitude: $backend_growth_pct
+
+  # Backing aggregate (aggr2, assumed 20 TB): milder secondary growth in used bytes.
+  # space.used_percent is derived and cannot be targeted directly.
+  - target: {object_type: aggregate, object_id: aggr2, metric: space.used_bytes}
+    pattern: linear_ramp
+    start_minute: $burst_start
+    duration_minutes: $burst_minutes
+    magnitude: $aggregate_growth_bytes
+
+labels:
+  - {object_id: trident1, start_minute: $burst_start, end_minute: $burst_end}
+  - {object_id: aggr2, start_minute: $burst_start, end_minute: $burst_end}
+
+variants:
+  mild:
+    # Modest burst; backend ends ~56 %.
+    split: heldout
+    params:
+      burst_start: 4320
+      burst_end: 4500
+      burst_minutes: 180
+      rate_add: 0.45
+      rate_drop: -0.45
+      pvc_growth: 80
+      backend_growth_pct: 18
+      aggregate_growth_bytes: 800000000000    # ~0.8 TB on 20 TB aggr
+  moderate:
+    # Clear burst; backend ends ~73 %.
+    split: heldout
+    params:
+      burst_start: 3600
+      burst_end: 3900
+      burst_minutes: 300
+      rate_add: 0.75
+      rate_drop: -0.75
+      pvc_growth: 220
+      backend_growth_pct: 35
+      aggregate_growth_bytes: 1600000000000   # ~1.6 TB
+  severe:
+    # Large burst; backend ends ~93 % (near full).
+    split: heldout
+    params:
+      burst_start: 2880
+      burst_end: 3180
+      burst_minutes: 300
+      rate_add: 1.85
+      rate_drop: -1.85
+      pvc_growth: 550
+      backend_growth_pct: 55
+      aggregate_growth_bytes: 2400000000000   # ~2.4 TB

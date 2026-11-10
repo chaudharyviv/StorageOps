@@ -1,0 +1,131 @@
+# Scenario 7: ransomware-like change pattern (held-out).
+# Two file-share volumes (vol03 primary, vol07 lagging by ~1 h) show a sudden,
+# sustained shift that looks like mass encryption spreading through shares:
+# change rate steps up, entropy rises, efficiency falls, snapshot used space
+# grows for the duration of the labelled window, and IOPS rise.
+# This is an anomaly demonstration only; it does not claim to reproduce any
+# NetApp feature behaviour.
+# Timeline: long healthy baseline → abrupt onset on vol03 → vol07 follows →
+# multi-hour plateau → labelled window ends (isolation or process stop).
+# Snapshot ramps are bounded by duration_minutes so they stop growing at the
+# end of each volume's window; other effects remain elevated afterward.
+scenario: ransomware_like_change
+description: >
+  Sudden ransomware-like change pattern on two volumes (vol07 lags ~1 h):
+  change rate and entropy rise, efficiency falls, snapshot space grows during
+  the window, and IOPS increase.
+duration_minutes: 10080
+effects:
+  # --- vol03 (primary) ---
+  - target: {object_type: volume, object_id: vol03, metric: data.change_rate_percent}
+    pattern: step
+    mode: multiply
+    start_minute: $onset_minute
+    magnitude: $change_rate_delta
+  - target: {object_type: volume, object_id: vol03, metric: data.entropy_proxy}
+    pattern: step
+    mode: add
+    start_minute: $onset_minute
+    magnitude: $entropy_add
+  - target: {object_type: volume, object_id: vol03, metric: efficiency.ratio}
+    pattern: step
+    mode: multiply
+    start_minute: $onset_minute
+    magnitude: $efficiency_delta
+  - target: {object_type: volume, object_id: vol03, metric: snapshot.used_bytes}
+    pattern: linear_ramp
+    start_minute: $onset_minute
+    duration_minutes: $window_minutes
+    magnitude: $snapshot_growth_bytes
+  - target: {object_type: volume, object_id: vol03, metric: iops}
+    pattern: step
+    mode: multiply
+    start_minute: $onset_minute
+    magnitude: $iops_delta
+
+  # --- vol07 (lags by ~1 h) ---
+  - target: {object_type: volume, object_id: vol07, metric: data.change_rate_percent}
+    pattern: step
+    mode: multiply
+    start_minute: $onset_minute_vol2
+    magnitude: $change_rate_delta_vol2
+  - target: {object_type: volume, object_id: vol07, metric: data.entropy_proxy}
+    pattern: step
+    mode: add
+    start_minute: $onset_minute_vol2
+    magnitude: $entropy_add_vol2
+  - target: {object_type: volume, object_id: vol07, metric: efficiency.ratio}
+    pattern: step
+    mode: multiply
+    start_minute: $onset_minute_vol2
+    magnitude: $efficiency_delta_vol2
+  - target: {object_type: volume, object_id: vol07, metric: snapshot.used_bytes}
+    pattern: linear_ramp
+    start_minute: $onset_minute_vol2
+    duration_minutes: $window_minutes_vol2
+    magnitude: $snapshot_growth_bytes_vol2
+  - target: {object_type: volume, object_id: vol07, metric: iops}
+    pattern: step
+    mode: multiply
+    start_minute: $onset_minute_vol2
+    magnitude: $iops_delta_vol2
+
+labels:
+  - {object_id: vol03, start_minute: $onset_minute, end_minute: $end_minute}
+  - {object_id: vol07, start_minute: $onset_minute_vol2, end_minute: $end_minute}
+
+variants:
+  mild:
+    split: heldout
+    params:
+      onset_minute: 3600
+      onset_minute_vol2: 3660
+      end_minute: 4320
+      window_minutes: 720
+      window_minutes_vol2: 660
+      change_rate_delta: 7.0          # ×8 from ~1.5 baseline
+      entropy_add: 0.25
+      efficiency_delta: -0.25         # ×0.75 from ~1.9
+      snapshot_growth_bytes: 200000000000   # 200 GB
+      iops_delta: 0.8                 # ×1.8
+      change_rate_delta_vol2: 6.0     # ×7 from ~1.6
+      entropy_add_vol2: 0.22
+      efficiency_delta_vol2: -0.20    # ×0.80 from ~1.8
+      snapshot_growth_bytes_vol2: 150000000000  # 150 GB
+      iops_delta_vol2: 0.6            # ×1.6
+  moderate:
+    split: heldout
+    params:
+      onset_minute: 2880
+      onset_minute_vol2: 2940
+      end_minute: 4320
+      window_minutes: 1440
+      window_minutes_vol2: 1380
+      change_rate_delta: 14.0         # ×15
+      entropy_add: 0.38
+      efficiency_delta: -0.40         # ×0.60
+      snapshot_growth_bytes: 500000000000   # 500 GB
+      iops_delta: 2.5                 # ×3.5
+      change_rate_delta_vol2: 12.0    # ×13
+      entropy_add_vol2: 0.35
+      efficiency_delta_vol2: -0.35    # ×0.65
+      snapshot_growth_bytes_vol2: 400000000000  # 400 GB
+      iops_delta_vol2: 2.0            # ×3
+  severe:
+    split: heldout
+    params:
+      onset_minute: 2160
+      onset_minute_vol2: 2220
+      end_minute: 4320
+      window_minutes: 2160
+      window_minutes_vol2: 2100
+      change_rate_delta: 24.0         # ×25
+      entropy_add: 0.47
+      efficiency_delta: -0.45         # ×0.55 → ~1.05 floor-safe
+      snapshot_growth_bytes: 1000000000000  # 1 TB
+      iops_delta: 5.0                 # ×6
+      change_rate_delta_vol2: 20.0    # ×21
+      entropy_add_vol2: 0.45
+      efficiency_delta_vol2: -0.38    # ×0.62
+      snapshot_growth_bytes_vol2: 800000000000  # 800 GB
+      iops_delta_vol2: 4.0            # ×5
